@@ -64,17 +64,19 @@ def split_training_and_testing_sets():
 
 def _parse_function(example):
 
-    features = tf.parse_single_example(example, features={
-        "image/encoded": tf.FixedLenFeature([], tf.string),
-        "image/height": tf.FixedLenFeature([], tf.int64),
-        "image/width": tf.FixedLenFeature([], tf.int64),
-        "image/filename": tf.FixedLenFeature([], tf.string),
-        "image/class/label": tf.FixedLenFeature([], tf.int64), })
+    parsed_example = tf.parse_single_example(example, features={
+        "image": tf.FixedLenFeature([], tf.string),
+        "label": tf.FixedLenFeature([], tf.int64)})
 
-    image_encode = features["image/encoded"]
-    image_raw = tf.image.decode_jpeg(image_encode, channels=3)
-    label = tf.one_hot(features["image/class/label"] - 1, 5)
-    return image_raw, label
+    image_shape = tf.stack([244, 244, 3])
+    image_raw = parsed_example['image']
+    image = tf.decode_raw(image_raw, tf.uint8)
+    image = tf.cast(image, tf.float32)
+    image = tf.reshape(image, image_shape)
+    # image = tf.reshape([])
+    label = tf.one_hot(parsed_example["label"], 5)
+    # label = parsed_example['label']
+    return image, label
 
 
 def read_TFRecord(dataset_name="train"):
@@ -84,7 +86,6 @@ def read_TFRecord(dataset_name="train"):
 
     print("the file queue is ", filename_queue)
     dataset = tf.data.TFRecordDataset(filename_queue)
-
     dataset = dataset.map(_parse_function)
 
     if dataset_name == "train":
@@ -95,6 +96,9 @@ def read_TFRecord(dataset_name="train"):
         dataset = dataset.batch(batch_size=1)
 
     iterator = dataset.make_initializable_iterator()
+    print("=======================================")
+    # print(iterator.get_next())
+    print("=======================================")
 
     return iterator
 
@@ -102,4 +106,10 @@ def read_TFRecord(dataset_name="train"):
 if __name__ == "__main__":
     pass
     # split_training_and_testing_sets()
-    # read_TFRecord("validation")
+    # iterator = read_TFRecord("train")
+    # next = iterator.get_next()
+    #
+    # with tf.Session() as sess:
+    #     sess.run(iterator.initializer)
+    #     img, lbl = sess.run(next)
+

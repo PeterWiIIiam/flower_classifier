@@ -19,7 +19,7 @@ class Vgg16(object):
 
         # This section sets up tf.data.iterator to input data
         self.train_iterator = read_TFRecord("train")
-        self.test_iterator = read_TFRecord("validation")
+        self.test_iterator = read_TFRecord("test")
 
         self.pred_input = tf.placeholder(dtype=tf.float32)
 
@@ -60,6 +60,7 @@ class Vgg16(object):
         self.Y = self.batch[1]
 
         self.loss = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(labels=self.Y, logits=self.fc8))
+
 
         self.train_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="fc8")
 
@@ -111,7 +112,7 @@ class Vgg16(object):
                     loss, summary, _ = self.sess.run([self.loss, self.loss_summary, self.train_op],
                                                      feed_dict={self.handle: self.train_iterator_handle})
                     self.file_writer.add_summary(summary)
-                    print loss,
+                    print(loss)
 
             except tf.errors.OutOfRangeError:
                 pass

@@ -23,7 +23,7 @@ def tfrecord_auto_traversal():
         print("Please be noted that only files end with '*.tfrecord' will be load!")
         tfrecord_list = list_tfrecord_file(current_folder_filename_list)
         if len(tfrecord_list) != 0:
-            for list_index in xrange(len(tfrecord_list)):
+            for list_index in range(len(tfrecord_list)):
                 print(tfrecord_list[list_index])
         else:
             print("Cannot find any tfrecord files, please check the path.")

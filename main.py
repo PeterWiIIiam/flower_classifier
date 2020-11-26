@@ -1,5 +1,6 @@
 import tensorflow as tf
 from model import *
+from datetime import datetime
 
 flags = tf.app.flags
 flags.DEFINE_boolean("train", True, "True for training")
@@ -8,6 +9,7 @@ flags.DEFINE_integer("epoch", 1000, "Epoch to train [1000]")
 flags.DEFINE_float("learning_rate", 0.000075, "Learning rate for training [0.000075]")
 flags.DEFINE_string("checkpoint_dir", "model", "Checkpoint directory []")
 flags.DEFINE_string("input_image_path", "", "input image name []")
+flags.DEFINE_string("summary_dir", "summary-{}".format(str(datetime.now())), "")
 FLAGS = flags.FLAGS
 
 
@@ -21,7 +23,8 @@ def main(_):
             model.test(FLAGS.checkpoint_dir)
 
         else:
-            model.train(FLAGS.learning_rate, FLAGS.epoch, FLAGS.checkpoint_dir)
+            model.train(FLAGS.learning_rate, FLAGS.epoch, FLAGS.checkpoint_dir,
+                        FLAGS.summary_dir)
 
 
     else:
