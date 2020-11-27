@@ -98,12 +98,15 @@ class Vgg16(object):
 
         self.train_op = tf.train.AdamOptimizer(learning_rate).minimize(self.loss, var_list=self.train_variables)
 
+        self.checkpoint_dir = checkpoint_dir
         self.sess.run([tf.global_variables_initializer()])
         self.add_summery(summary_dir)
         self.load_model(checkpoint_dir)
+        min_epoch_loss = 1000000000000
 
         for epoch in range(epoch_num):
             print("epoch {} losses".format(epoch))
+            epoch_loss = 0
 
             # Initialize the iterator at the beginning of each epoch
             self.sess.run([self.train_iterator.initializer])
@@ -112,13 +115,19 @@ class Vgg16(object):
                     loss, summary, _ = self.sess.run([self.loss, self.loss_summary, self.train_op],
                                                      feed_dict={self.handle: self.train_iterator_handle})
                     self.file_writer.add_summary(summary)
+                    epoch_loss += loss
                     print(loss)
 
             except tf.errors.OutOfRangeError:
                 pass
 
-            if epoch % 50 == 0 and epoch != 0:
-                self.saver.save(self.sess, os.path.join(os.getcwd(), "{}/model".format(checkpoint_dir)))
+            if epoch_loss < min_epoch_loss and epoch != 0:
+                print("Found a good model, saving ... ")
+                self.save_model()
+
+    def save_model(self):
+        """This function saves the current session"""
+        self.saver.save(self.sess, os.path.join(os.getcwd(), "{}/model".format(self.checkpoint_dir)))
 
     def test(self, checkpoint_dir):
         """This function goes through the test set"""
