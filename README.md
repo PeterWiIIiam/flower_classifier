@@ -15,7 +15,7 @@ python download.py
 ```
 1. Download flower images from the link: 
 https://www.kaggle.com/alxmamaev/flowers-recognition
-2. Download vgg16_weights.npz from https://neurohive.io/en/popular-networks/vgg16/
+2. Download vgg16_weights.npz from https://www.cs.toronto.edu/~frossard/post/vgg16/
 3. Move it under the depository folder
 4. Resize and split the image data into 
 training and testing set. Create the corresponding TFRecord 
